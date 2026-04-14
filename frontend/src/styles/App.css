@@ -1,0 +1,95 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.risk-low {
+  color: #10b981;
+}
+
+.risk-medium {
+  color: #f59e0b;
+}
+
+.risk-high {
+  color: #ef4444;
+}
+
+.risk-severe {
+  color: #dc2626;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.score-gauge {
+  transition: all 0.5s ease-in-out;
+}
+
+.recommendation-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Survey page styles */
+.survey-question {
+  margin-bottom: 2rem;
+}
+
+.survey-slider {
+  margin: 1rem 0;
+}
+
+/* Results page styles */
+.results-score {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* Dashboard styles */
+.dashboard-card {
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Loading states */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .results-score {
+    font-size: 2rem;
+  }
+  
+  .chart-container {
+    padding: 0.5rem;
+  }
+}
