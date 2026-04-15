@@ -1,0 +1,19 @@
+
+global:
+  scrape_interval: 5s # Check every 5 seconds
+
+scrape_configs:
+  # 1. Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Monitor your EC2 Server limits
+  - job_name: 'ec2-server'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # 3. Monitor your NeuroBalance Python Backend
+  - job_name: 'fastapi-backend'
+    static_configs:
+      - targets: ['backend:8000']
