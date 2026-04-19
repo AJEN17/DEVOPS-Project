@@ -13,7 +13,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "neuro_sg" {
-  name        = "neurobalance-sg"
+  name        = "neurobalance-sg-v2"  # <-- Change this line
   description = "Allow all necessary ports for the DevOps stack"
 
   ingress {
@@ -82,16 +82,20 @@ resource "aws_security_group" "neuro_sg" {
 
 resource "aws_instance" "neuro_server" {
   ami           = data.aws_ami.ubuntu.id
-  # For a "no-cost if eligible" AWS Free Tier demo you can use: t2.micro
-  # If you specifically want 1GB RAM on newer gen (paid): t3.micro
-  instance_type = "t2.micro"
-  
-  key_name      = "jenkins-key" 
-  
-  vpc_security_group_ids = [aws_security_group.neuro_sg.id]
+  instance_type = "t3.micro"
+  key_name      = "jenkins-key"
 
+  # --- ADD THIS NEW BLOCK ---
+  root_block_device {
+    volume_size = 30    # Max allowed on AWS Free Tier
+    volume_type = "gp3" # Faster, modern storage
+  }
+  # --------------------------
+
+  vpc_security_group_ids = [aws_security_group.neuro_sg.id]
+  
   tags = {
-    Name = "NeuroBalance-DevOps-Server"
+    Name = "NeuroBalance-DevOps-Server-V2"
   }
 }
 
