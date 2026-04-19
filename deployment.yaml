@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuro-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neuro-backend
+  template:
+    metadata:
+      labels:
+        app: neuro-backend
+    spec:
+      containers:
+      - name: backend
+        image: neurobalance-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "200Mi"
+          limits:
+            cpu: "250m"
+            memory: "450Mi"
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuro-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neuro-frontend
+  template:
+    metadata:
+      labels:
+        app: neuro-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: neurobalance-frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "32Mi"
+          limits:
+            cpu: "100m"
+            memory: "96Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10

@@ -1,12 +1,13 @@
 # Build Stage
 FROM node:18-alpine as build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
 
-# 👇 THE FIX: Force Node to use up to 2GB of memory (RAM + Swap)
-RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build
+# Keep builds stable on low-RAM machines (uses swap if configured)
+ENV NODE_OPTIONS=--max-old-space-size=1024
+RUN npm run build
 
 # Production Stage
 FROM nginx:alpine

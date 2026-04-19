@@ -64,6 +64,14 @@ resource "aws_security_group" "neuro_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Custom App Port (14641)"
+    from_port   = 14641
+    to_port     = 14641
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -74,7 +82,9 @@ resource "aws_security_group" "neuro_sg" {
 
 resource "aws_instance" "neuro_server" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro" 
+  # For a "no-cost if eligible" AWS Free Tier demo you can use: t2.micro
+  # If you specifically want 1GB RAM on newer gen (paid): t3.micro
+  instance_type = "t2.micro"
   
   key_name      = "jenkins-key" 
   

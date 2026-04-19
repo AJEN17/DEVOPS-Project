@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 import json
 from typing import List, Dict
-from prometheus_fastapi_instrumentator import Instrumentator # Add this import
+from prometheus_fastapi_instrumentator import Instrumentator as PrometheusInstrumentator
 
 from .schemas import SurveyResponse, PredictionResponse, HistoricalData
 from .ml_model import predictor
@@ -20,7 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Instrumentator().instrument(app).expose(app)
+# Prometheus /metrics endpoint (must come after middleware setup)
+PrometheusInstrumentator().instrument(app).expose(app)
 
 # In-memory storage for demo (use database in production)
 historical_data = []

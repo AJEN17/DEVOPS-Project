@@ -7,6 +7,8 @@ services:
       - neuro_net
     depends_on:
       - backend
+    restart: unless-stopped
+    mem_limit: 128m
 
   backend:
     build: ./backend
@@ -16,28 +18,12 @@ services:
       neuro_net:
         aliases:
           - backend
-
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - neuro_net
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-    networks:
-      - neuro_net
+    restart: unless-stopped
+    mem_limit: 512m
+    environment:
+      - PYTHONUNBUFFERED=1
 
 networks:
   neuro_net:
+    name: neuro_net
     driver: bridge
-
-volumes:
-  grafana-data:
