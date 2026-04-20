@@ -63,6 +63,7 @@ services:
 
 networks:
   neuro_net:
+    external: true
     name: neuro_net
 
 volumes:
