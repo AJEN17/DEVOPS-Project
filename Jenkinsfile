@@ -1,21 +1,21 @@
 pipeline {
     agent any
-
     options {
+        timestamps()
         timeout(time: 15, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
 
     // This creates a checkbox in Jenkins so you can choose to deploy monitoring or save RAM
     parameters {
-        booleanParam(name: 'DEPLOY_MONITORING', defaultValue: true, description: 'Start Prometheus+Grafana (Uncheck to save RAM).')
+        booleanParam(name: 'DEPLOY_MONITORING', defaultValue: false, description: 'Start Prometheus+Grafana (check only if you have enough RAM).')
     }
 
     stages {
         stage('Checkout SCM') {
             steps {
                 checkout scm
-                sh 'git config --global --add safe.directory "$WORKSPACE"'
+                sh 'git config --global --add safe.directory "$WORKSPACE" || true'
             }
         }
 
@@ -26,7 +26,8 @@ pipeline {
                 echo "Tearing down old containers..."
                 docker compose -f docker-compose.yml down || true
                 docker compose -f docker-compose.monitoring.yml down || true
-                docker network prune -f
+                docker network prune -f || true
+                docker system prune -f || true
                 '''
             }
         }
@@ -44,7 +45,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Starting Frontend and Backend..."
-                docker compose -f docker-compose.yml up -d
+                docker compose -f docker-compose.yml up -d --remove-orphans
                 '''
             }
         }
@@ -76,8 +77,21 @@ pipeline {
             steps {
                 sh '''
                 echo "Starting Monitoring Stack..."
-                docker compose -f docker-compose.monitoring.yml up -d
+                docker compose -f docker-compose.monitoring.yml up -d --remove-orphans
                 '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh """
+                  docker ps
+                  curl -fsS http://localhost:8000/health || true
+                  curl -fsS http://localhost:8000/metrics | head -n 5 || true
+                  if [ "${params.DEPLOY_MONITORING}" = "true" ]; then
+                    curl -fsS http://localhost:9090/-/ready || true
+                  fi
+                """
             }
         }
     }
@@ -88,10 +102,10 @@ pipeline {
             sh 'docker image prune -af || true'
         }
         success {
-            echo "✅ DEPLOYMENT SUCCESSFUL! The NeuroBalance system is live."
+            echo "DEPLOYMENT SUCCESSFUL! The NeuroBalance system is live."
         }
         failure {
-            echo "❌ DEPLOYMENT FAILED! Please check the stage logs above."
+            echo "DEPLOYMENT FAILED! Please check the stage logs above."
         }
     }
 }
